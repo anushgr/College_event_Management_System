@@ -21,8 +21,8 @@ const EventCard = ({ event, role, onDelete }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] flex flex-col h-full group">
-      <div className="p-6 flex-grow">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] flex flex-col h-full group relative">
+      <Link to={`/events/${event.id}`} className="p-6 flex-grow block focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset">
         <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-indigo-700 transition-colors duration-300">
           {event.title}
         </h3>
@@ -37,7 +37,7 @@ const EventCard = ({ event, role, onDelete }) => {
         <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed mb-4">
           {event.description}
         </p>
-      </div>
+      </Link>
 
       {role === 'ORGANIZER' && (
         <div className="p-4 bg-gray-50 flex space-x-3 border-t border-gray-100 mt-auto">

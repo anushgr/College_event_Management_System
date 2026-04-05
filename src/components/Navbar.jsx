@@ -7,64 +7,97 @@ const Navbar = () => {
   const { role, logout, token } = useAuth();
 
   const linkClass = (active) =>
-    `px-4 py-2 rounded-lg transition-colors duration-200 ${
+    `relative px-4 py-2 text-sm font-medium transition-all duration-300 ${
       active
-        ? 'bg-indigo-600 text-white shadow-md'
-        : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-600'
+        ? 'text-indigo-600'
+        : 'text-gray-600 hover:text-indigo-600'
     }`;
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="sticky top-0 z-50 backdrop-blur-lg bg-white/80 border-b border-gray-200 shadow-sm">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          <div className="flex items-center space-x-2">
-            <Link to="/dashboard" className="flex items-center space-x-2 text-indigo-700 font-bold text-xl drop-shadow-sm">
-              <Calendar className="w-8 h-8" />
-              <span>EventManager</span>
+
+          {/* 🔹 Logo Section */}
+          <div className="flex items-center space-x-3">
+            <Link to="/dashboard" className="flex items-center space-x-2 group">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md group-hover:scale-105 transition-transform duration-300">
+                <Calendar className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                EventManager
+              </span>
             </Link>
-            <div className="hidden md:ml-8 md:flex md:space-x-4">
-              <NavLink
-                to="/dashboard"
-                className={({ isActive: active }) => linkClass(active)}
-              >
-                Dashboard
+
+            {/* 🔹 Nav Links */}
+            <div className="hidden md:flex md:ml-10 md:space-x-6">
+              <NavLink to="/dashboard">
+                {({ isActive }) => (
+                  <span className={linkClass(isActive)}>
+                    Dashboard
+                    {isActive && (
+                      <span className="absolute left-0 -bottom-1 w-full h-[2px] bg-indigo-600 rounded-full"></span>
+                    )}
+                  </span>
+                )}
               </NavLink>
+
               {role === 'ORGANIZER' && (
-                <NavLink
-                  to="/add-event"
-                  className={({ isActive: active }) => linkClass(active)}
-                >
-                  Add Event
+                <NavLink to="/add-event">
+                  {({ isActive }) => (
+                    <span className={linkClass(isActive)}>
+                      Add Event
+                      {isActive && (
+                        <span className="absolute left-0 -bottom-1 w-full h-[2px] bg-indigo-600 rounded-full"></span>
+                      )}
+                    </span>
+                  )}
                 </NavLink>
               )}
             </div>
           </div>
 
+          {/* 🔹 Right Section */}
           <div className="flex items-center space-x-4">
+
             {token ? (
               <>
-                <div className="hidden sm:block mr-2">
-                  <span className="text-xs uppercase tracking-wider text-gray-400 font-semibold">Logged in as</span>
-                  <p className="text-sm font-medium text-gray-700">{role}</p>
+                {/* Role Info */}
+                <div className="hidden sm:flex flex-col items-end mr-2">
+                  <span className="text-[10px] uppercase tracking-wider text-gray-400">
+                    Logged in as
+                  </span>
+                  <span className="text-sm font-semibold text-gray-700">
+                    {role}
+                  </span>
                 </div>
+
+                {/* Logout Button */}
                 <button
                   onClick={logout}
-                  className="flex items-center space-x-2 bg-rose-50 text-rose-600 px-4 py-2 rounded-lg hover:bg-rose-600 hover:text-white transition-all duration-300 font-medium border border-rose-100"
+                  className="flex items-center space-x-2 px-4 py-2 rounded-xl 
+                  bg-gradient-to-r from-rose-500 to-red-500 text-white 
+                  shadow-md hover:shadow-lg hover:scale-105 
+                  transition-all duration-300"
                 >
-                  <LogOut className="w-5 h-5" />
-                  <span>Logout</span>
+                  <LogOut className="w-4 h-4" />
+                  <span className="text-sm font-medium">Logout</span>
                 </button>
               </>
             ) : (
               <Link
                 to="/login"
-                className="flex items-center space-x-2 bg-indigo-600 text-white px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition-all duration-300 font-semibold shadow-md shadow-indigo-200"
+                className="flex items-center space-x-2 px-5 py-2 rounded-xl 
+                bg-gradient-to-r from-indigo-500 to-purple-600 text-white 
+                shadow-md hover:shadow-lg hover:scale-105 
+                transition-all duration-300"
               >
-                <LogIn className="w-5 h-5" />
-                <span>Login</span>
+                <LogIn className="w-4 h-4" />
+                <span className="text-sm font-semibold">Login</span>
               </Link>
             )}
           </div>
+
         </div>
       </div>
     </nav>

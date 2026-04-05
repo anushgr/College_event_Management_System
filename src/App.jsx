@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import AddEventPage from './pages/AddEventPage';
 import EditEventPage from './pages/EditEventPage';
+import EventDetailsPage from './pages/EventDetailsPage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           {/* Public Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/events/:id" element={<EventDetailsPage />} />
 
           {/* Protected Organizer-Only Routes */}
           <Route element={<ProtectedRoute requiredRole="ORGANIZER" />}>
