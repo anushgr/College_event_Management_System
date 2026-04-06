@@ -36,7 +36,7 @@ pipeline {
                 echo '======== Installing & building React app ========'
                 bat '''
                     node --version
-                    npm --version
+                    call npm --version
                     call npm ci
                     call npm run build
                     echo "✅ Frontend build complete"
@@ -51,6 +51,7 @@ pipeline {
                 echo '======== Building Spring Boot JAR ========'
                 dir('backend') {
                     bat '''
+                        set JAVA_HOME=
                         call gradlew.bat bootJar --no-daemon -x test
                         echo "✅ Backend JAR created"
                         dir build\\libs\\
