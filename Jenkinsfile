@@ -25,8 +25,8 @@ pipeline {
             steps {
                 echo '======== Checking out source code ========'
                 checkout scm
-                sh 'echo "Branch: $(git branch --show-current)"'
-                sh 'echo "Commit: $(git rev-parse --short HEAD)"'
+                bat 'git branch --show-current'
+                bat 'git rev-parse --short HEAD'
             }
         }
 
@@ -34,13 +34,13 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 echo '======== Installing & building React app ========'
-                sh '''
+                bat '''
                     node --version
                     npm --version
-                    npm ci
-                    npm run build
+                    call npm ci
+                    call npm run build
                     echo "✅ Frontend build complete"
-                    ls -la dist/
+                    dir dist
                 '''
             }
         }
@@ -50,11 +50,10 @@ pipeline {
             steps {
                 echo '======== Building Spring Boot JAR ========'
                 dir('backend') {
-                    sh '''
-                        chmod +x gradlew
-                        ./gradlew bootJar --no-daemon -x test
+                    bat '''
+                        call gradlew.bat bootJar --no-daemon -x test
                         echo "✅ Backend JAR created"
-                        ls -la build/libs/
+                        dir build\\libs\\
                     '''
                 }
             }
@@ -64,24 +63,23 @@ pipeline {
         stage('Docker Build') {
             steps {
                 echo '======== Building Docker Images ========'
-                sh '''
-                    # Build frontend image
-                    echo "Building frontend Docker image..."
-                    docker build -f Dockerfile.frontend \
-                        -t ${FRONTEND_IMAGE}:${IMAGE_TAG} \
-                        -t ${FRONTEND_IMAGE}:latest \
+                bat """
+                    @echo off
+                    echo Building frontend Docker image...
+                    docker build -f Dockerfile.frontend ^
+                        -t ${FRONTEND_IMAGE}:${IMAGE_TAG} ^
+                        -t ${FRONTEND_IMAGE}:latest ^
                         .
 
-                    # Build backend image
-                    echo "Building backend Docker image..."
-                    docker build -f Dockerfile.backend \
-                        -t ${BACKEND_IMAGE}:${IMAGE_TAG} \
-                        -t ${BACKEND_IMAGE}:latest \
+                    echo Building backend Docker image...
+                    docker build -f Dockerfile.backend ^
+                        -t ${BACKEND_IMAGE}:${IMAGE_TAG} ^
+                        -t ${BACKEND_IMAGE}:latest ^
                         .
 
-                    echo "======== Docker Images Created ========"
-                    docker images | grep "event-management"
-                '''
+                    echo ======== Docker Images Created ========
+                    docker images | findstr "event-management"
+                """
             }
         }
 
@@ -98,18 +96,19 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    sh '''
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-
+                    bat """
+                        @echo off
+                        echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+                        
                         docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
                         docker push ${FRONTEND_IMAGE}:latest
-
+                        
                         docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
                         docker push ${BACKEND_IMAGE}:latest
-
+                        
                         echo "✅ Images pushed to Docker Hub"
                         docker logout
-                    '''
+                    """
                 }
             }
         }
@@ -118,26 +117,27 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo '======== Starting Application Containers ========'
-                sh '''
-                    # Stop and remove any existing containers
-                    docker rm -f event-frontend event-backend 2>/dev/null || true
+                bat '''
+                    @echo off
+                    REM Stop and remove any existing containers
+                    docker rm -f event-frontend event-backend >nul 2>&1
 
-                    # Run backend container
-                    docker run -d \
-                        --name event-backend \
-                        -p 8080:8080 \
-                        --restart unless-stopped \
-                        ${BACKEND_IMAGE}:latest
+                    REM Run backend container
+                    docker run -d ^
+                        --name event-backend ^
+                        -p 8080:8080 ^
+                        --restart unless-stopped ^
+                        %BACKEND_IMAGE%:latest
 
-                    # Run frontend container
-                    docker run -d \
-                        --name event-frontend \
-                        -p 80:80 \
-                        --link event-backend:backend \
-                        --restart unless-stopped \
-                        ${FRONTEND_IMAGE}:latest
+                    REM Run frontend container
+                    docker run -d ^
+                        --name event-frontend ^
+                        -p 80:80 ^
+                        --link event-backend:backend ^
+                        --restart unless-stopped ^
+                        %FRONTEND_IMAGE%:latest
 
-                    echo "======== Running Containers ========"
+                    echo ======== Running Containers ========
                     docker ps --filter "name=event-"
 
                     echo "✅ Application deployed!"
@@ -151,20 +151,22 @@ pipeline {
         stage('Verify') {
             steps {
                 echo '======== Verifying Deployment ========'
-                sh '''
-                    sleep 10
-                    echo "--- All Docker Images ---"
+                bat '''
+                    @echo off
+                    timeout /t 10 /nobreak >nul
+                    
+                    echo --- All Docker Images ---
                     docker images
 
-                    echo ""
-                    echo "--- Running Containers ---"
+                    echo.
+                    echo --- Running Containers ---
                     docker ps
 
-                    echo ""
-                    echo "--- Container Logs (backend) ---"
-                    docker logs event-backend --tail 20 || true
+                    echo.
+                    echo --- Container Logs (backend) ---
+                    docker logs event-backend --tail 20
 
-                    echo ""
+                    echo.
                     echo "✅ Verification complete"
                 '''
             }
@@ -191,7 +193,7 @@ pipeline {
             ╚══════════════════════════════════════╝
             """
             // Clean up failed containers
-            sh 'docker rm -f event-frontend event-backend 2>/dev/null || true'
+            bat 'docker rm -f event-frontend event-backend >nul 2>&1'
         }
         always {
             echo 'Pipeline execution complete.'
