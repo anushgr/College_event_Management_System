@@ -28,8 +28,8 @@ echo [OK] Done.
 
 echo.
 echo [STEP 5] Starting Backend Container...
-docker run -d --name event-backend -p 8080:8080 event-management-backend:latest
-echo [OK] Backend running on port 8080.
+docker run -d --name event-backend -p 8081:8080 event-management-backend:latest
+echo [OK] Backend running on port 8081.
 
 echo.
 echo [STEP 6] Starting Frontend Container...
@@ -46,6 +46,6 @@ echo.
 echo ============================================================
 echo   Application is LIVE!
 echo   Frontend: http://localhost
-echo   Backend:  http://localhost:8080
+echo   Backend:  http://localhost:8081
 echo ============================================================
 pause

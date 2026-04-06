@@ -90,33 +90,35 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo '======== Starting Application Containers ========'
-                bat '''
+                bat """
                     @echo off
                     REM Stop and remove any existing containers
                     docker rm -f event-frontend event-backend >nul 2>&1
 
                     REM Run backend container
+                    echo Starting Backend: ${BACKEND_IMAGE}:latest
                     docker run -d ^
                         --name event-backend ^
-                        -p 8080:8080 ^
+                        -p 8081:8080 ^
                         --restart unless-stopped ^
-                        %BACKEND_IMAGE%:latest
+                        ${BACKEND_IMAGE}:latest
 
                     REM Run frontend container
+                    echo Starting Frontend: ${FRONTEND_IMAGE}:latest
                     docker run -d ^
                         --name event-frontend ^
                         -p 80:80 ^
                         --link event-backend:backend ^
                         --restart unless-stopped ^
-                        %FRONTEND_IMAGE%:latest
+                        ${FRONTEND_IMAGE}:latest
 
                     echo ======== Running Containers ========
                     docker ps --filter "name=event-"
 
-                    echo "✅ Application deployed!"
-                    echo "Frontend: http://localhost:80"
-                    echo "Backend:  http://localhost:8080"
-                '''
+                    echo ✅ Application deployed!
+                    echo Frontend: http://localhost:80
+                    echo Backend:  http://localhost:8081
+                """
             }
         }
 
