@@ -30,35 +30,7 @@ pipeline {
             }
         }
 
-        // ── Stage 2: Build Frontend ──────────────────────────────────────────
-        stage('Build Frontend') {
-            steps {
-                echo '======== Installing & building React app ========'
-                bat '''
-                    node --version
-                    call npm --version
-                    call npm ci
-                    call npm run build
-                    echo "✅ Frontend build complete"
-                    dir dist
-                '''
-            }
-        }
 
-        // ── Stage 3: Build Backend ───────────────────────────────────────────
-        stage('Build Backend') {
-            steps {
-                echo '======== Building Spring Boot JAR ========'
-                dir('backend') {
-                    bat '''
-                        set JAVA_HOME=
-                        call gradlew.bat bootJar --no-daemon -x test
-                        echo "✅ Backend JAR created"
-                        dir build\\libs\\
-                    '''
-                }
-            }
-        }
 
         // ── Stage 4: Docker Build ────────────────────────────────────────────
         stage('Docker Build') {
