@@ -12,12 +12,6 @@ services:
       - "8081:8080"
     env_file:
       - .env
-    # We still need careful mapping if the .env variable names differ from Spring's names
-    environment:
-      - SPRING_DATASOURCE_URL=${DB_URL}
-      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
-      - JWT_SECRET=${JWT_SECRET}
     networks:
       - event-network
     restart: unless-stopped
