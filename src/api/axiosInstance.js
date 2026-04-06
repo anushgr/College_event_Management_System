@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: import.meta.env.PROD ? '/api' : 'http://localhost:8081/api', // Use the new port 8081 for dev as well
 });
 
 // Request interceptor to attach the JWT token
