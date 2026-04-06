@@ -26,7 +26,12 @@ const AddEventPage = () => {
     setError(null);
 
     try {
-      await axiosInstance.post('/events', formData);
+      // datetime-local gives "2026-05-20T10:00" — append ":00" so backend LocalDateTime parses it correctly
+      const payload = {
+        ...formData,
+        date: formData.date.length === 16 ? formData.date + ':00' : formData.date,
+      };
+      await axiosInstance.post('/events', payload);
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create event. Please check all fields.');

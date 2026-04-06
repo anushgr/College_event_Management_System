@@ -49,7 +49,11 @@ const EditEventPage = () => {
     setError(null);
 
     try {
-      await axiosInstance.put(`/events/${id}`, formData);
+      const payload = {
+        ...formData,
+        date: formData.date.length === 16 ? formData.date + ':00' : formData.date,
+      };
+      await axiosInstance.put(`/events/${id}`, payload);
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update event. Please check all fields.');

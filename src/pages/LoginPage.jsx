@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axiosInstance from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import { Mail, Lock, User, AlertCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -88,8 +89,13 @@ const LoginPage = () => {
             </button>
           </form>
         </div>
-        <div className="bg-gray-50 py-6 px-12 border-t border-gray-100 text-center">
-          <p className="text-sm text-gray-500 font-medium">Secured connection to Spring Boot Backend</p>
+        <div className="bg-gray-50 py-5 px-12 border-t border-gray-100 text-center">
+          <p className="text-sm text-gray-500 font-medium">
+            Don&apos;t have an account?{' '}
+            <Link to="/signup" className="text-indigo-600 font-bold hover:text-indigo-800 transition-colors">
+              Sign up
+            </Link>
+          </p>
         </div>
       </div>
     </div>
