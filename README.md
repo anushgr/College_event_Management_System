@@ -1,10 +1,10 @@
-# 🎉 Event Management Application — Frontend
+# Event Management Application — Frontend
 
 A modern, responsive React frontend for managing community events. Built with **React 18**, **Tailwind CSS**, and **React Router v6**, connecting to a Spring Boot REST API backend.
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 ### Dashboard (Public)
 The main dashboard displays all events in a responsive card grid — accessible without login.
@@ -17,7 +17,7 @@ Form pages for creating and editing events, with field validation and modern UI.
 
 ---
 
-## 🚀 Tech Stack
+## Tech Stack
 
 | Technology | Purpose |
 |---|---|
@@ -31,7 +31,7 @@ Form pages for creating and editing events, with field validation and modern UI.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
@@ -55,7 +55,7 @@ src/
 
 ---
 
-## 🔗 API Endpoints
+## API Endpoints
 
 This frontend connects to a **Spring Boot REST API** at `http://localhost:8080/api`:
 
@@ -70,7 +70,7 @@ This frontend connects to a **Spring Boot REST API** at `http://localhost:8080/a
 
 ---
 
-## 🛣️ Routes
+## Routes
 
 | Path | Component | Access |
 |------|-----------|--------|
@@ -82,7 +82,7 @@ This frontend connects to a **Spring Boot REST API** at `http://localhost:8080/a
 
 ---
 
-## 🛠️ Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -114,7 +114,7 @@ npm run preview
 
 ---
 
-## 🔐 Authentication & Roles
+## Authentication & Roles
 
 The app uses **JWT-based authentication** with two roles:
 
@@ -129,7 +129,7 @@ The app uses **JWT-based authentication** with two roles:
 
 ---
 
-## ✨ Features
+## Features
 
 - ✅ **Public Dashboard** — Browse events without login
 - ✅ **JWT Authentication** — Secure login with token persistence
@@ -145,7 +145,7 @@ The app uses **JWT-based authentication** with two roles:
 
 ---
 
-## 🎨 Design System
+## Design System
 
 - **Primary Color**: Indigo/Purple (`#3047eb`)
 - **Accent**: Rose for destructive actions
@@ -156,7 +156,7 @@ The app uses **JWT-based authentication** with two roles:
 
 ---
 
-## 📦 Available Scripts
+## Available Scripts
 
 | Command | Description |
 |---------|-------------|
@@ -166,7 +166,7 @@ The app uses **JWT-based authentication** with two roles:
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -176,12 +176,9 @@ The app uses **JWT-based authentication** with two roles:
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the ISC License.
 
 ---
 
-<p align="center">
-  Built with ❤️ using React + Tailwind CSS
-</p>
