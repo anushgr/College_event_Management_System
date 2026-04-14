@@ -4,7 +4,7 @@ pipeline {
     // ─── Environment Variables ───────────────────────────────────────────────
     environment {
         // Change these to match your Docker Hub / registry username
-        DOCKER_HUB_USER    = 'your-dockerhub-username'
+        DOCKER_HUB_USER    = 'abhimp1234'
         FRONTEND_IMAGE     = "${DOCKER_HUB_USER}/event-management-frontend"
         BACKEND_IMAGE      = "${DOCKER_HUB_USER}/event-management-backend"
         IMAGE_TAG          = "${BUILD_NUMBER}"                // e.g. "42"
@@ -58,10 +58,6 @@ pipeline {
 
         // ── Stage 5: Docker Push (Optional – requires Docker Hub creds) ──────
         stage('Docker Push') {
-            when {
-                // Only push when building from main branch
-                branch 'main'
-            }
             steps {
                 echo '======== Pushing images to Docker Hub ========'
                 withCredentials([usernamePassword(
@@ -128,7 +124,7 @@ pipeline {
                 echo '======== Verifying Deployment ========'
                 bat '''
                     @echo off
-                    timeout /t 10 /nobreak >nul
+                    powershell -Command "Start-Sleep -s 10"
                     
                     echo --- All Docker Images ---
                     docker images
@@ -157,7 +153,7 @@ pipeline {
             ║  Build #${BUILD_NUMBER} completed    ║
             ╚══════════════════════════════════════╝
             Frontend: http://localhost:80
-            Backend:  http://localhost:8080/api
+            Backend:  http://localhost:8081
             """
         }
         failure {
