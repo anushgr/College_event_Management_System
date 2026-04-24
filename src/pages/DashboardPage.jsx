@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axiosInstance from '../api/axiosInstance';
-import EventCard from '../components/EventCard';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';

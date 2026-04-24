@@ -58,6 +58,10 @@ pipeline {
 
         // ── Stage 5: Docker Push (Optional – requires Docker Hub creds) ──────
         stage('Docker Push') {
+            when {
+                // Only push when building from main branch
+                branch 'main'
+            }
             steps {
                 echo '======== Pushing images to Docker Hub ========'
                 withCredentials([usernamePassword(
@@ -124,7 +128,7 @@ pipeline {
                 echo '======== Verifying Deployment ========'
                 bat '''
                     @echo off
-                    powershell -Command "Start-Sleep -s 10"
+                    timeout /t 10 /nobreak >nul
                     
                     echo --- All Docker Images ---
                     docker images
@@ -142,6 +146,34 @@ pipeline {
                 '''
             }
         }
+
+        // ── Stage 8: Kubernetes Deployment ──────────────────────────────────
+        stage('Deploy to Kubernetes') {
+            steps {
+                echo '======== Deploying to Kubernetes (Minikube) ========'
+                bat """
+                    @echo off
+                    echo Applying Kubernetes manifests...
+                    kubectl apply -f k8s/namespace.yaml
+                    kubectl apply -f k8s/secrets.yaml
+                    
+                    REM Update images in manifests to match this build
+                    powershell -Command "(Get-Content k8s/backend.yaml) -replace 'image: event-management-backend:latest', 'image: ${BACKEND_IMAGE}:${IMAGE_TAG}' | Set-Content k8s/backend.yaml"
+                    powershell -Command "(Get-Content k8s/frontend.yaml) -replace 'image: event-management-frontend:latest', 'image: ${FRONTEND_IMAGE}:${IMAGE_TAG}' | Set-Content k8s/frontend.yaml"
+
+                    kubectl apply -f k8s/backend.yaml
+                    kubectl apply -f k8s/frontend.yaml
+
+                    echo Waiting for deployments to stabilize...
+                    kubectl rollout status deployment/event-backend -n event-management --timeout=90s
+                    kubectl rollout status deployment/event-frontend -n event-management --timeout=90s
+
+                    echo ======== Kubernetes Status ========
+                    kubectl get pods -n event-management
+                    kubectl get services -n event-management
+                """
+            }
+        }
     }
 
     // ─── Post Actions ────────────────────────────────────────────────────────
@@ -153,7 +185,7 @@ pipeline {
             ║  Build #${BUILD_NUMBER} completed    ║
             ╚══════════════════════════════════════╝
             Frontend: http://localhost:80
-            Backend:  http://localhost:8081
+            Backend:  http://localhost:8080/api
             """
         }
         failure {
