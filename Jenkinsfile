@@ -56,12 +56,8 @@ pipeline {
             }
         }
 
-        // ── Stage 5: Docker Push (Optional – requires Docker Hub creds) ──────
+        // ── Stage 5: Docker Push ─────────────────────────────────────────────
         stage('Docker Push') {
-            when {
-                // Only push when building from main branch
-                branch 'main'
-            }
             steps {
                 echo '======== Pushing images to Docker Hub ========'
                 withCredentials([usernamePassword(
