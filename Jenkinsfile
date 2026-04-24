@@ -62,8 +62,8 @@ pipeline {
                 echo '======== Pushing images to Docker Hub ========'
                 withCredentials([usernamePassword(
                     credentialsId: "${DOCKER_CREDENTIALS}",
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
+                    usernameVariable: 'abhimp1234',
+                    passwordVariable: 'Abhimp@8686'
                 )]) {
                     bat """
                         @echo off
