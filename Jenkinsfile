@@ -4,7 +4,7 @@ pipeline {
     // ─── Environment Variables ───────────────────────────────────────────────
     environment {
         // Change these to match your Docker Hub / registry username
-        DOCKER_HUB_USER    = 'abhimp1234'
+        DOCKER_HUB_USER    = 'anushgr'
         FRONTEND_IMAGE     = "${DOCKER_HUB_USER}/event-management-frontend"
         BACKEND_IMAGE      = "${DOCKER_HUB_USER}/event-management-backend"
         IMAGE_TAG          = "${BUILD_NUMBER}"                // e.g. "42"
@@ -95,7 +95,7 @@ pipeline {
                     echo Starting Backend: ${BACKEND_IMAGE}:latest
                     docker run -d ^
                         --name event-backend ^
-                        -p 8081:8080 ^
+                        -p 8081:8081 ^
                         --restart unless-stopped ^
                         ${BACKEND_IMAGE}:latest
 
@@ -144,33 +144,43 @@ pipeline {
         }
 
         // ── Stage 8: Kubernetes Deployment ──────────────────────────────────
-        stage('Deploy to Kubernetes') {
-            steps {
-                echo '======== Deploying to Kubernetes (Minikube) ========'
-                bat """
-                    @echo off
-                    echo Applying Kubernetes manifests...
-                    kubectl apply -f k8s/namespace.yaml
-                    kubectl apply -f k8s/secrets.yaml
-                    
-                    REM Update images in manifests to match this build
-                    powershell -Command "(Get-Content k8s/backend.yaml) -replace 'image: event-management-backend:latest', 'image: ${BACKEND_IMAGE}:${IMAGE_TAG}' | Set-Content k8s/backend.yaml"
-                    powershell -Command "(Get-Content k8s/frontend.yaml) -replace 'image: event-management-frontend:latest', 'image: ${FRONTEND_IMAGE}:${IMAGE_TAG}' | Set-Content k8s/frontend.yaml"
+stage('Deploy to Kubernetes') {
+    steps {
+        echo '======== Deploying to Kubernetes (Minikube) ========'
 
-                    kubectl apply -f k8s/backend.yaml
-                    kubectl apply -f k8s/frontend.yaml
+        withCredentials([file(credentialsId: 'kubeconfig-minikube', variable: 'KUBECONFIG')]) {
 
-                    echo Waiting for deployments to stabilize...
-                    kubectl rollout status deployment/event-backend -n event-management --timeout=90s
-                    kubectl rollout status deployment/event-frontend -n event-management --timeout=90s
+            bat """
+                @echo off
 
-                    echo ======== Kubernetes Status ========
-                    kubectl get pods -n event-management
-                    kubectl get services -n event-management
-                """
-            }
+                echo Using kubeconfig: %KUBECONFIG%
+
+                kubectl config current-context
+                kubectl get nodes
+
+                echo Applying Kubernetes manifests...
+                kubectl apply -f k8s/namespace.yaml
+                kubectl apply -f k8s/secrets.yaml
+
+                REM Update images in manifests to match this build
+                powershell -Command "(Get-Content k8s/backend.yaml) -replace 'image: event-management-backend:latest', 'image: ${BACKEND_IMAGE}:${IMAGE_TAG}' | Set-Content k8s/backend.yaml"
+
+                powershell -Command "(Get-Content k8s/frontend.yaml) -replace 'image: event-management-frontend:latest', 'image: ${FRONTEND_IMAGE}:${IMAGE_TAG}' | Set-Content k8s/frontend.yaml"
+
+                kubectl apply -f k8s/backend.yaml
+                kubectl apply -f k8s/frontend.yaml
+
+                echo Waiting for deployments to stabilize...
+                kubectl rollout status deployment/event-backend -n event-management --timeout=90s
+                kubectl rollout status deployment/event-frontend -n event-management --timeout=90s
+
+                echo ======== Kubernetes Status ========
+                kubectl get pods -n event-management
+                kubectl get services -n event-management
+            """
         }
     }
+}
 
     // ─── Post Actions ────────────────────────────────────────────────────────
     post {
@@ -181,7 +191,7 @@ pipeline {
             ║  Build #${BUILD_NUMBER} completed    ║
             ╚══════════════════════════════════════╝
             Frontend: http://localhost:80
-            Backend:  http://localhost:8080/api
+            Backend:  http://localhost:8081/api
             """
         }
         failure {
