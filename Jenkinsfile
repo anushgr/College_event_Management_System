@@ -144,43 +144,36 @@ pipeline {
         }
 
         // ── Stage 8: Kubernetes Deployment ──────────────────────────────────
-stage('Deploy to Kubernetes') {
-    steps {
-        echo '======== Deploying to Kubernetes (Minikube) ========'
+        stage('Deploy to Kubernetes') {
+            steps {
+                echo '======== Deploying to Kubernetes (Minikube) ========'
+                
+                withCredentials([file(credentialsId: 'kubeconfig-minikube', variable: 'KUBECONFIG')]) {
 
-        withCredentials([file(credentialsId: 'kubeconfig-minikube', variable: 'KUBECONFIG')]) {
+                bat """
+                    @echo off
+                    echo Applying Kubernetes manifests...
+                    kubectl apply -f k8s/namespace.yaml
+                    kubectl apply -f k8s/secrets.yaml
+                    
+                    REM Update images in manifests to match this build
+                    powershell -Command "(Get-Content k8s/backend.yaml) -replace 'image: event-management-backend:latest', 'image: ${BACKEND_IMAGE}:${IMAGE_TAG}' | Set-Content k8s/backend.yaml"
+                    powershell -Command "(Get-Content k8s/frontend.yaml) -replace 'image: event-management-frontend:latest', 'image: ${FRONTEND_IMAGE}:${IMAGE_TAG}' | Set-Content k8s/frontend.yaml"
 
-            bat """
-                @echo off
+                    kubectl apply -f k8s/backend.yaml
+                    kubectl apply -f k8s/frontend.yaml
 
-                echo Using kubeconfig: %KUBECONFIG%
+                    echo Waiting for deployments to stabilize...
+                    kubectl rollout status deployment/event-backend -n event-management --timeout=90s
+                    kubectl rollout status deployment/event-frontend -n event-management --timeout=90s
 
-                kubectl config current-context
-                kubectl get nodes
-
-                echo Applying Kubernetes manifests...
-                kubectl apply -f k8s/namespace.yaml
-                kubectl apply -f k8s/secrets.yaml
-
-                REM Update images in manifests to match this build
-                powershell -Command "(Get-Content k8s/backend.yaml) -replace 'image: event-management-backend:latest', 'image: ${BACKEND_IMAGE}:${IMAGE_TAG}' | Set-Content k8s/backend.yaml"
-
-                powershell -Command "(Get-Content k8s/frontend.yaml) -replace 'image: event-management-frontend:latest', 'image: ${FRONTEND_IMAGE}:${IMAGE_TAG}' | Set-Content k8s/frontend.yaml"
-
-                kubectl apply -f k8s/backend.yaml
-                kubectl apply -f k8s/frontend.yaml
-
-                echo Waiting for deployments to stabilize...
-                kubectl rollout status deployment/event-backend -n event-management --timeout=90s
-                kubectl rollout status deployment/event-frontend -n event-management --timeout=90s
-
-                echo ======== Kubernetes Status ========
-                kubectl get pods -n event-management
-                kubectl get services -n event-management
-            """
+                    echo ======== Kubernetes Status ========
+                    kubectl get pods -n event-management
+                    kubectl get services -n event-management
+                """
+            }
         }
     }
-}
 
     // ─── Post Actions ────────────────────────────────────────────────────────
     post {
