@@ -172,6 +172,7 @@ pipeline {
                     kubectl get services -n event-management
                 """
             }
+            }
         }
     }
 
