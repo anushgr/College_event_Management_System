@@ -4,7 +4,7 @@ pipeline {
     // ─── Environment Variables ───────────────────────────────────────────────
     environment {
         // Change these to match your Docker Hub / registry username
-        DOCKER_HUB_USER    = 'abhimp1234'
+        DOCKER_HUB_USER    = 'anushgr'
         FRONTEND_IMAGE     = "${DOCKER_HUB_USER}/event-management-frontend"
         BACKEND_IMAGE      = "${DOCKER_HUB_USER}/event-management-backend"
         IMAGE_TAG          = "${BUILD_NUMBER}"                // e.g. "42"
