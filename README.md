@@ -1,184 +1,90 @@
-# Event Management Application — Frontend
+# College Event Management System — Full Stack
+### Integrated with Docker, Jenkins & Kubernetes
 
-A modern, responsive React frontend for managing community events. Built with **React 18**, **Tailwind CSS**, and **React Router v6**, connecting to a Spring Boot REST API backend.
-
----
-
-## Screenshots
-
-### Dashboard (Public)
-The main dashboard displays all events in a responsive card grid — accessible without login.
-
-### Login Page
-A clean, centered login form for authentication with JWT support.
-
-### Add / Edit Event (Organizer Only)
-Form pages for creating and editing events, with field validation and modern UI.
+A modern, full-stack application for managing community events. This project features a **React 18** frontend, a **Spring Boot** REST API backend, and a complete **CI/CD Pipeline** using Jenkins and Kubernetes.
 
 ---
 
-## Tech Stack
+## 🚀 Key Features
 
-| Technology | Purpose |
+- ✅ **Full-Stack Orchestration**: Backend and Frontend connected via Docker.
+- ✅ **CI/CD Pipeline**: Automated Build, Push, and Deploy stages in Jenkins.
+- ✅ **Kubernetes Ready**: Complete manifest files for deployment on Minikube.
+- ✅ **JWT Authentication**: Secure login with role-based access (USER / ORGANIZER).
+- ✅ **Premium UI**: Glassmorphism dashboard with responsive design and Lucide icons.
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Technology |
 |---|---|
-| **React 18** | UI library with functional components & hooks |
-| **React Router DOM v6** | Client-side routing & navigation |
-| **Tailwind CSS 3** | Utility-first CSS framework |
-| **Axios** | HTTP client for REST API communication |
-| **Lucide React** | Beautiful SVG icon library |
-| **Vite 6** | Fast dev server & build tool |
-| **Context API** | Global state management (auth/role) |
+| **Frontend** | React 18, Tailwind CSS, Vite, Axios, Lucide React |
+| **Backend** | Spring Boot (Java 17), Gradle, JWT, REST API |
+| **Database** | Neon PostgreSQL (Cloud Hosting) |
+| **DevOps** | Docker, Docker Compose, Jenkins, Kubernetes (Minikube) |
 
 ---
 
-## Project Structure
+## 📂 Project Structure
 
-```
-src/
-├── api/
-│   └── axiosInstance.js          # Axios instance with base URL + JWT interceptor
-├── context/
-│   └── AuthContext.jsx           # Auth context: token, role, login(), logout()
-├── components/
-│   ├── Navbar.jsx                # Navigation bar with role-based links
-│   ├── EventCard.jsx             # Event card with edit/delete for organizers
-│   └── ProtectedRoute.jsx        # Route guard for organizer-only pages
-├── pages/
-│   ├── LoginPage.jsx             # Login form with error handling
-│   ├── DashboardPage.jsx         # Event grid with loading/empty/error states
-│   ├── AddEventPage.jsx          # Create new event form (organizer only)
-│   └── EditEventPage.jsx         # Edit existing event form (organizer only)
-├── App.jsx                       # React Router routes configuration
-├── main.jsx                      # Application entry point
-└── index.css                     # Global styles + Tailwind directives
+```text
+.
+├── backend/                # Spring Boot REST API
+├── src/                    # React Frontend Source
+├── k8s/                    # Kubernetes Manifests (Namespace, Deployments, Services)
+├── Dockerfile.backend      # Multi-stage Java build
+├── Dockerfile.frontend     # Multi-stage Node/Nginx build
+├── Jenkinsfile             # 8-Stage CI/CD Pipeline
+├── docker-compose.yml      # Local full-stack orchestration
+└── nginx.conf              # Nginx proxy configuration
 ```
 
 ---
 
-## API Endpoints
+## ⚙️ Deployment Options
 
-This frontend connects to a **Spring Boot REST API** at `http://localhost:8080/api`:
-
-| Method | Endpoint | Description | Access |
-|--------|----------|-------------|--------|
-| `POST` | `/auth/login` | Authenticate user, returns JWT + role | Public |
-| `GET` | `/events` | Fetch all events | Public |
-| `GET` | `/events/{id}` | Fetch single event by ID | Public |
-| `POST` | `/events` | Create a new event | Organizer |
-| `PUT` | `/events/{id}` | Update an existing event | Organizer |
-| `DELETE` | `/events/{id}` | Delete an event | Organizer |
-
----
-
-## Routes
-
-| Path | Component | Access |
-|------|-----------|--------|
-| `/` | Redirects to `/dashboard` | Public |
-| `/login` | `LoginPage` | Public |
-| `/dashboard` | `DashboardPage` | Public |
-| `/add-event` | `AddEventPage` | Organizer only |
-| `/edit-event/:id` | `EditEventPage` | Organizer only |
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- **Node.js** v18+ and **npm** v9+
-- Spring Boot backend running on port `8080` (optional — demo data shown when unavailable)
-
-### Installation
-
+### 1. Local Development
 ```bash
-# Clone the repository
-git clone https://github.com/Abhijith-K-N/event-management.git
-cd event-management
+# Start Backend
+cd backend && ./gradlew bootRun
 
-# Install dependencies
+# Start Frontend
 npm install
-
-# Start development server
 npm run dev
 ```
 
-The app will be available at **http://localhost:3000**
-
-### Build for Production
-
+### 2. Docker Compose (One-Click Local Deployment)
 ```bash
-npm run build
-npm run preview
+docker-compose up -d --build
+```
+- **Frontend**: http://localhost
+- **Backend API**: http://localhost:8081/api
+
+### 3. Jenkins CI/CD Pipeline
+The `Jenkinsfile` automates the following stages:
+1. **Checkout** -> 2. **Build** -> 3. **Push to Docker Hub** -> 4. **Local Deploy** -> 5. **Deploy to Kubernetes**
+
+### 4. Kubernetes (Minikube)
+```bash
+# Load images into Minikube
+minikube image load abhimp1234/event-management-frontend:latest
+minikube image load abhimp1234/event-management-backend:latest
+
+# Apply manifests
+kubectl apply -f k8s/
 ```
 
 ---
 
-## Authentication & Roles
-
-The app uses **JWT-based authentication** with two roles:
-
-| Role | Capabilities |
-|------|-------------|
-| **USER** | View all events on the dashboard |
-| **ORGANIZER** | View events + Create, Edit, and Delete events |
-
-- Token and role are stored in `localStorage`
-- Axios interceptor automatically attaches `Authorization: Bearer <token>` to all requests
-- Protected routes redirect unauthorized users
+## 🔐 Configuration
+The application requires a `.env` file in the root directory with the following variables:
+- `SPRING_DATASOURCE_URL`: Cloud DB URL
+- `SPRING_DATASOURCE_USERNAME`: DB Username
+- `SPRING_DATASOURCE_PASSWORD`: DB Password
+- `JWT_SECRET`: Secret key for token signing
 
 ---
 
-## Features
-
-- ✅ **Public Dashboard** — Browse events without login
-- ✅ **JWT Authentication** — Secure login with token persistence
-- ✅ **Role-Based Access** — Organizer-only routes for event management
-- ✅ **Responsive Design** — 3-col desktop, 2-col tablet, 1-col mobile
-- ✅ **Loading States** — Animated spinners on all async operations
-- ✅ **Error Handling** — Inline error messages (no alerts)
-- ✅ **Demo Fallback** — Shows sample events when backend is unavailable
-- ✅ **Hover Animations** — Cards scale up with shadow on hover
-- ✅ **Form Validation** — All fields required with focus ring styling
-- ✅ **Delete Confirmation** — Confirmation dialog before deleting events
-- ✅ **Modern Typography** — Google Fonts (Outfit, Inter)
-
----
-
-## Design System
-
-- **Primary Color**: Indigo/Purple (`#3047eb`)
-- **Accent**: Rose for destructive actions
-- **Background**: Gray-50 (`#f9fafb`)
-- **Cards**: White with rounded corners and hover shadows
-- **Font Family**: Outfit / Inter (Google Fonts)
-- **Border Radius**: `rounded-2xl` / `rounded-3xl`
-
----
-
-## Available Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start Vite dev server on port 3000 |
-| `npm run build` | Build for production |
-| `npm run preview` | Preview production build |
-
----
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## License
-
+## 📜 License
 This project is licensed under the ISC License.
-
----
-
