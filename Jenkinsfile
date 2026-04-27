@@ -170,7 +170,7 @@ pipeline {
                     kubectl get pods -n event-management
                     kubectl get services -n event-management
                 """
-            }
+            
             }
         }
     }
