@@ -148,7 +148,6 @@ pipeline {
             steps {
                 echo '======== Deploying to Kubernetes (Minikube) ========'
                 
-                withCredentials([file(credentialsId: 'kubeconfig-minikube', variable: 'KUBECONFIG')]) {
 
                 bat """
                     @echo off
